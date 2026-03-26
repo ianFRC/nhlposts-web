@@ -55,6 +55,7 @@ def main() -> None:
             logger.info("Season %s: %d total games known", season, len(games))
 
         # ── Step 2: Ingest pending (un-ingested, OFF/FINAL) games ──────── #
+        all_new_game_ids: list[int] = []
         for season in SEASONS:
             pending = store.get_pending_games(season=season)
             if not pending:
@@ -65,6 +66,7 @@ def main() -> None:
             logger.info("Season %s: ingesting %d pending games...", season, len(game_ids))
 
             result = ingester.ingest_batch(game_ids)
+            all_new_game_ids.extend(result.newly_ingested_game_ids)
             logger.info(
                 "Season %s: processed=%d  post_shots=%d  failed=%d",
                 season, result.games_processed, result.post_shots_found, result.games_failed,
@@ -76,15 +78,17 @@ def main() -> None:
             n = resolver.fetch_all_rosters(season)
             logger.info("Season %s: %d players upserted", season, n)
 
-        # ── Step 4: Fetch game logs (GP/shots/goals) for all players ──── #
-        for season in SEASONS:
-            pairs = store.get_distinct_player_seasons(season=season)
+        # ── Step 4: Fetch game logs only for players in newly ingested games #
+        if all_new_game_ids:
+            pairs = store.get_players_in_games(all_new_game_ids)
             logger.info(
-                "Season %s: fetching GP for %d player-season pairs...",
-                season, len(pairs),
+                "Fetching GP for %d players across %d newly ingested games...",
+                len(pairs), len(all_new_game_ids),
             )
             n = resolver.fetch_games_played_for_players(pairs)
-            logger.info("Season %s: GP fetched for %d players", season, n)
+            logger.info("GP fetched for %d players", n)
+        else:
+            logger.info("No new games ingested, skipping GP fetch")
 
         # ── Step 5: Resolve any unknown players ───────────────────────── #
         for season in SEASONS:

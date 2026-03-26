@@ -218,7 +218,9 @@ class PostgresStore:
                  home_team_id, home_team_abbrev,
                  away_team_id, away_team_abbrev, game_state)
             VALUES %s
-            ON CONFLICT (game_id) DO NOTHING
+            ON CONFLICT (game_id) DO UPDATE SET
+                game_state = EXCLUDED.game_state
+            WHERE games.ingested = false
             """,
             rows,
         )
@@ -243,7 +245,7 @@ class PostgresStore:
         date_from: str | None = None,
         date_to: str | None = None,
     ) -> list[dict]:
-        clauses = ["ingested=false", "game_state='OFF'"]
+        clauses = ["ingested=false", "game_state IN ('OFF','FINAL','CRIT')"]
         params: list[Any] = []
         if season:
             clauses.append("season=%s")
@@ -507,6 +509,17 @@ class PostgresStore:
         where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
         sql = f"SELECT DISTINCT shooting_player_id, season FROM post_shots {where}"
         rows = self._exec(sql, params, fetchall=True) or []
+        return [(r["shooting_player_id"], r["season"]) for r in rows]
+
+    def get_players_in_games(self, game_ids: list[int]) -> list[tuple[int, str]]:
+        """Return (player_id, season) pairs for players with post shots in these games."""
+        if not game_ids:
+            return []
+        rows = self._exec(
+            "SELECT DISTINCT shooting_player_id, season FROM post_shots WHERE game_id = ANY(%s)",
+            (game_ids,),
+            fetchall=True,
+        ) or []
         return [(r["shooting_player_id"], r["season"]) for r in rows]
 
     # ------------------------------------------------------------------ #

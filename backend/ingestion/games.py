@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from api.client import NHLClient, NotFoundError
@@ -154,6 +154,7 @@ class IngestResult:
     games_skipped: int = 0
     games_failed: int = 0
     post_shots_found: int = 0
+    newly_ingested_game_ids: list = field(default_factory=list)
 
 
 class GameIngester:
@@ -234,6 +235,7 @@ class GameIngester:
                     _, shots = future.result()
                     result.games_processed += 1
                     result.post_shots_found += shots
+                    result.newly_ingested_game_ids.append(gid)
                     if progress_callback:
                         progress_callback(gid, shots)
                 except Exception as exc:
