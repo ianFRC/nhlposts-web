@@ -13,6 +13,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { RinkSVG } from "./ShotMapTab";
 
 export function PlayerSpotlightTab() {
   const params = useFilterStore((s) => s.getParams());
@@ -62,10 +63,32 @@ export function PlayerSpotlightTab() {
         <div className="space-y-4">
           {/* Player header */}
           <div className="rounded-lg border border-border bg-card p-4">
-            <h2 className="text-xl font-bold">{data.player.name}</h2>
-            <p className="text-sm text-muted-foreground">
-              {data.player.team} · {data.player.position} · Shoots {data.player.shoots}
-            </p>
+            <div className="flex items-center gap-4">
+              {/* Headshot */}
+              {data.player.headshot_url && (
+                <img
+                  src={data.player.headshot_url}
+                  alt={data.player.name}
+                  className="h-20 w-20 rounded-full object-cover bg-muted"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+              )}
+              <div className="flex-1">
+                <h2 className="text-xl font-bold">{data.player.name}</h2>
+                <p className="text-sm text-muted-foreground">
+                  {data.player.position} · Shoots {data.player.shoots}
+                </p>
+              </div>
+              {/* Team logo */}
+              {data.player.team && (
+                <img
+                  src={`https://assets.nhle.com/logos/nhl/svg/${data.player.team}_light.svg`}
+                  alt={data.player.team}
+                  className="h-16 w-16 object-contain"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+              )}
+            </div>
           </div>
 
           {/* Stats grid */}
@@ -108,15 +131,75 @@ export function PlayerSpotlightTab() {
             </div>
           )}
 
+          {/* Individual shots table */}
+          {data.shots?.length > 0 && (
+            <div className="rounded-lg border border-border bg-card p-4">
+              <h3 className="mb-3 text-sm font-semibold">
+                All Post Shots ({data.shots.length})
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-border text-left text-muted-foreground">
+                      <th className="pb-2 pr-4">Date</th>
+                      <th className="pb-2 pr-4">Matchup</th>
+                      <th className="pb-2 pr-4">Period</th>
+                      <th className="pb-2 pr-4">Time</th>
+                      <th className="pb-2 pr-4">Location</th>
+                      <th className="pb-2 pr-4">Shot Type</th>
+                      <th className="pb-2">Strength</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.shots.map((s, i) => (
+                      <tr key={i} className="border-b border-border/50 last:border-0">
+                        <td className="py-1.5 pr-4 tabular-nums">{s.game_date}</td>
+                        <td className="py-1.5 pr-4">{s.matchup}</td>
+                        <td className="py-1.5 pr-4 tabular-nums">
+                          {s.period_type === "OT" ? "OT" : s.period}
+                        </td>
+                        <td className="py-1.5 pr-4 tabular-nums">{s.time_in_period}</td>
+                        <td className="py-1.5 pr-4">
+                          <span className={
+                            s.reason === "hit-crossbar" ? "text-yellow-400" :
+                            s.reason === "hit-left-post" ? "text-cyan-400" :
+                            "text-lime-400"
+                          }>
+                            {s.reason === "hit-crossbar" ? "Crossbar" :
+                             s.reason === "hit-left-post" ? "Left Post" : "Right Post"}
+                          </span>
+                        </td>
+                        <td className="py-1.5 pr-4 capitalize">{s.shot_type}</td>
+                        <td className="py-1.5">{s.strength_state}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* Shot locations on rink */}
           {data.locations.length > 0 && (
             <div className="rounded-lg border border-border bg-card p-4">
               <h3 className="mb-2 text-sm font-semibold">
                 Shot Locations ({data.locations.length} shots)
               </h3>
-              <p className="text-xs text-muted-foreground">
-                Yellow = Crossbar · Cyan = Left Post · Lime = Right Post
-              </p>
+              <div className="mb-3 flex gap-4">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="inline-block h-3 w-3 rounded-full bg-yellow-400" />
+                  Crossbar
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="inline-block h-3 w-3 rounded-full bg-cyan-400" />
+                  Left Post
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="inline-block h-3 w-3 rounded-full bg-lime-400" />
+                  Right Post
+                </div>
+              </div>
+              <RinkSVG locations={data.locations} />
             </div>
           )}
         </div>

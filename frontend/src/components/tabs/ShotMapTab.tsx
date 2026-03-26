@@ -29,7 +29,7 @@ const REASON_COLOR: Record<string, string> = {
   "hit-right-post": "#a3e635",
 };
 
-function RinkSVG({ locations }: { locations: ShotLocation[] }) {
+export function RinkSVG({ locations }: { locations: ShotLocation[] }) {
   return (
     <svg
       viewBox={`0 0 ${SVG_W} ${SVG_H}`}

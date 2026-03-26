@@ -280,11 +280,25 @@ class Aggregator:
 
     def by_location(self, spec: FilterSpec) -> pd.DataFrame:
         where, params = build_where_clause(spec)
-        where_clause = (
-            f"WHERE {where} AND ps.x_coord IS NOT NULL"
-            if where
-            else "WHERE ps.x_coord IS NOT NULL"
-        )
+        coord_filter = "ps.x_coord IS NOT NULL"
+        where_clause = f"WHERE {where} AND {coord_filter}" if where else f"WHERE {coord_filter}"
+
+        # Filter to players who meet min_events threshold
+        threshold_filter = ""
+        threshold_params: list[Any] = []
+        if spec.min_events > 1:
+            sub_where = f"WHERE {where}" if where else ""
+            threshold_filter = f"""
+            AND ps.shooting_player_id IN (
+                SELECT ps2.shooting_player_id
+                FROM post_shots ps2
+                LEFT JOIN games g2 ON g2.game_id = ps2.game_id
+                {sub_where}
+                GROUP BY ps2.shooting_player_id
+                HAVING COUNT(*) >= {spec.min_events}
+            )"""
+            threshold_params = list(params)
+
         sql = f"""
         SELECT
             ps.x_coord,
@@ -298,8 +312,9 @@ class Aggregator:
                           ELSE g.away_team_abbrev END, '')    AS team
         {_BASE_JOIN}
         {where_clause}
+        {threshold_filter}
         """
-        return _query(self._conn, sql, params)
+        return _query(self._conn, sql, params + threshold_params)
 
     def home_away_splits(self, spec: FilterSpec) -> pd.DataFrame:
         where, params = build_where_clause(spec)
@@ -366,7 +381,8 @@ class Aggregator:
             ps.strength,
             ps.x_coord,
             ps.y_coord,
-            ps.zone_code
+            ps.zone_code,
+            CASE WHEN ps.is_home THEN g.home_team_abbrev ELSE g.away_team_abbrev END AS team
         {_BASE_JOIN}
         {where_clause}
         ORDER BY ps.game_date, ps.time_seconds

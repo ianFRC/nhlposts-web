@@ -71,10 +71,11 @@ export const api = {
 
   spotlight: (name: string, params: FilterParams) =>
     apiFetch<{
-      player: { player_id: number; name: string; team: string; position: string; shoots: string };
+      player: { player_id: number; name: string; team: string; position: string; shoots: string; headshot_url: string };
       stats: PlayerRow;
       game_log: { game_date: string; matchup: string; post_shots: number }[];
       locations: ShotLocation[];
+      shots: { game_date: string; matchup: string; period: number; period_type: string; time_in_period: string; reason: string; shot_type: string; strength_state: string }[];
     }>("/api/spotlight", { ...params, name } as FilterParams),
 
   shotmap: (params: FilterParams) =>

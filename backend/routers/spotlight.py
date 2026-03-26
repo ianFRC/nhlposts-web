@@ -24,10 +24,17 @@ def get_spotlight(
         resolver = PlayerResolver(store, client)
         matches = resolver.resolve_name(name, threshold=60)
 
-    if not matches:
-        raise HTTPException(status_code=404, detail=f"No player found matching '{name}'")
+        if not matches:
+            raise HTTPException(status_code=404, detail=f"No player found matching '{name}'")
 
-    player = matches[0]
+        # Fetch headshot URL from NHL player landing API
+        player = matches[0]
+        try:
+            landing = client.get(f"/player/{player.player_id}/landing")
+            headshot_url = landing.get("headshot", "")
+        except Exception:
+            headshot_url = ""
+
     player_id = player.player_id
 
     # Per-player summary stats
@@ -43,6 +50,13 @@ def get_spotlight(
 
     # Raw event log (for game-by-game + shot map)
     detail_df = agg.player_detail(player_id, player_spec)
+
+    # Derive current team from most recent game (handles traded players correctly)
+    current_team = player.team_abbrev
+    if not detail_df.empty and "team" in detail_df.columns:
+        last_team = detail_df.sort_values("game_date").iloc[-1]["team"]
+        if last_team:
+            current_team = last_team
 
     if not detail_df.empty:
         detail_df = detail_df.fillna("")
@@ -62,19 +76,26 @@ def get_spotlight(
         locations = detail_df[detail_df["x_coord"] != ""][
             ["x_coord", "y_coord", "reason", "shot_type", "strength_state"]
         ].to_dict(orient="records")
+        shots = detail_df[
+            ["game_date", "matchup", "period", "period_type", "time_in_period",
+             "reason", "shot_type", "strength_state"]
+        ].sort_values("game_date", ascending=False).to_dict(orient="records")
     else:
         game_log = []
         locations = []
+        shots = []
 
     return {
         "player": {
             "player_id": player.player_id,
             "name": player.full_name,
-            "team": player.team_abbrev,
+            "team": current_team,
             "position": player.position_code,
             "shoots": player.shoots,
+            "headshot_url": headshot_url,
         },
         "stats": stats,
         "game_log": game_log,
         "locations": locations,
+        "shots": shots,
     }
