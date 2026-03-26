@@ -4,22 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
 export function DataTab() {
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["sync-status"],
     queryFn: api.syncStatus,
   });
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Data Sync Status</h2>
-        <button
-          onClick={() => refetch()}
-          className="rounded bg-muted px-3 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
-        >
-          Refresh
-        </button>
-      </div>
+      <h2 className="text-sm font-semibold">Data Sync Status</h2>
 
       {isLoading ? (
         <div className="text-muted-foreground">Loading...</div>
