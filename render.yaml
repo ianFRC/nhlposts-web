@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: nhl-posts-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false   # Set manually in Render dashboard
+      - key: SYNC_SECRET
+        sync: false
+      - key: SYNC_SEASONS
+        value: 20242025,20252026
