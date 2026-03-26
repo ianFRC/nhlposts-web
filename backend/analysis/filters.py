@@ -79,7 +79,7 @@ def build_where_clause(spec: FilterSpec) -> tuple[str, list[Any]]:
     if spec.team_ids:
         _in("ps.event_owner_team_id", spec.team_ids)
     if spec.team_abbrevs:
-        _in("p.team_abbrev", spec.team_abbrevs)
+        _in("CASE WHEN ps.is_home THEN g.home_team_abbrev ELSE g.away_team_abbrev END", spec.team_abbrevs)
     if spec.position_groups:
         _in("p.position_group", spec.position_groups)
     if spec.shoots:
