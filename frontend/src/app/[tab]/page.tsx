@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
@@ -57,6 +57,10 @@ export default function TabPage({
   const { tab } = params;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const activeTabRef = useCallback((node: HTMLAnchorElement | null) => {
+    if (node) node.scrollIntoView({ block: "nearest", inline: "center" });
+  }, []);
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Mobile backdrop */}
@@ -99,6 +103,7 @@ export default function TabPage({
             <Link
               key={t.id}
               href={`/${t.id}`}
+              ref={tab === t.id ? activeTabRef : null}
               className={`whitespace-nowrap rounded px-3 py-1.5 text-sm font-medium transition-colors ${
                 tab === t.id
                   ? "bg-primary text-primary-foreground"
