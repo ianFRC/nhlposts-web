@@ -103,3 +103,7 @@ Adapted from the original app. `GameIngester` fetches play-by-play, parses `type
 | `SYNC_SEASONS` | backend, GitHub Actions | e.g. `20242025,20252026` |
 | `NEXT_PUBLIC_API_URL` | frontend (Vercel) | Render backend URL |
 | `RENDER_BACKEND_URL` | GitHub Actions | Used by CI to ping backend after sync |
+
+## Playwright testing
+
+Use the Playwright MCP tool for visual testing. Screenshots and console logs are saved to `.playwright-mcp/` (gitignored). **Delete all Playwright-generated images from `.playwright-mcp/` and the project root when testing is complete.**
