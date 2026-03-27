@@ -2,11 +2,6 @@ name: Backfill GP Data
 
 on:
   workflow_dispatch:
-    inputs:
-      dates:
-        description: 'Dates to backfill (space-separated YYYY-MM-DD). Leave blank for yesterday.'
-        required: false
-        default: ''
 
 jobs:
   backfill:
@@ -30,9 +25,4 @@ jobs:
       - name: Run GP backfill
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          ARGS=""
-          for d in ${{ inputs.dates }}; do
-            ARGS="$ARGS --date $d"
-          done
-          python sync/backfill_gp.py $ARGS
+        run: python sync/backfill_gp.py
