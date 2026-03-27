@@ -82,7 +82,10 @@ export default function TabPage({
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         {/* Tab bar */}
-        <nav className="flex flex-shrink-0 items-center gap-1 overflow-x-auto border-b border-border bg-card px-2 py-2">
+        <div className="relative flex-shrink-0 border-b border-border">
+          {/* Fade hint — mobile only */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-card to-transparent md:hidden" />
+        <nav className="flex items-center gap-1 overflow-x-auto bg-card px-2 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {/* Mobile filter toggle */}
           <button
             className="mr-1 flex-shrink-0 rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground md:hidden"
@@ -106,6 +109,7 @@ export default function TabPage({
             </Link>
           ))}
         </nav>
+        </div>
 
         {/* Tab content */}
         <main className="flex-1 overflow-y-auto p-2 md:p-4">
