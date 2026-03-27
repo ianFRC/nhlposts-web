@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useFilterStore } from "@/lib/filterStore";
 import { api } from "@/lib/api";
@@ -17,8 +18,17 @@ import { RinkSVG } from "./ShotMapTab";
 
 export function PlayerSpotlightTab() {
   const params = useFilterStore((s) => s.getParams());
+  const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const player = searchParams.get("player");
+    if (player) {
+      setName(player);
+      setSearch(player);
+    }
+  }, [searchParams]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["spotlight", search, params],

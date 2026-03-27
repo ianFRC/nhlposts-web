@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import Link from "next/link";
 import { useFilterStore } from "@/lib/filterStore";
 import { api } from "@/lib/api";
 import type { PlayerRow } from "@/lib/types";
@@ -81,7 +82,14 @@ export function PlayersTab() {
                   i % 2 === 0 ? "" : "bg-muted/30"
                 } hover:bg-muted/60`}
               >
-                <td className="px-3 py-1.5 font-medium">{row.player_name}</td>
+                <td className="px-3 py-1.5 font-medium">
+                  <Link
+                    href={`/spotlight?player=${encodeURIComponent(row.player_name)}`}
+                    className="hover:underline hover:text-primary"
+                  >
+                    {row.player_name}
+                  </Link>
+                </td>
                 <td className="px-3 py-1.5 text-muted-foreground">{row.team}</td>
                 <td className="px-3 py-1.5 text-muted-foreground">{row.position}</td>
                 <td className="px-3 py-1.5">{row.post_shots}</td>
