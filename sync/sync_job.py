@@ -85,7 +85,7 @@ def main() -> None:
                 "Fetching GP for %d players across %d newly ingested games...",
                 len(pairs), len(all_new_game_ids),
             )
-            n = resolver.fetch_games_played_for_players(pairs)
+            n = resolver.fetch_games_played_for_players(pairs, force=True)
             logger.info("GP fetched for %d players", n)
         else:
             logger.info("No new games ingested, skipping GP fetch")

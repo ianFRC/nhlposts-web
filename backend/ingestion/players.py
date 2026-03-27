@@ -147,11 +147,12 @@ class PlayerResolver:
         player_season_pairs: list[tuple[int, str]],
         game_type: int = 2,
         progress_callback=None,
+        force: bool = False,
     ) -> int:
         fetched = 0
         total = len(player_season_pairs)
         for i, (player_id, season) in enumerate(player_season_pairs):
-            if self._store.is_player_gp_fetched(player_id, season, game_type):
+            if not force and self._store.is_player_gp_fetched(player_id, season, game_type):
                 if progress_callback:
                     progress_callback(i + 1, total)
                 continue
