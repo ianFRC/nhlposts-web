@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useFilterStore } from "@/lib/filterStore";
 import { api } from "@/lib/api";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, X } from "lucide-react";
 
 function MultiSelect({
   label,
@@ -102,7 +102,7 @@ function NumberInput({
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ onClose }: { onClose?: () => void }) {
   const store = useFilterStore();
   const { data: opts } = useQuery({
     queryKey: ["filter-options"],
@@ -115,13 +115,24 @@ export function Sidebar() {
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-sm font-bold text-foreground">NHL Post Tracker</h1>
-        <button
-          onClick={store.reset}
-          title="Reset filters"
-          className="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent"
-        >
-          <RotateCcw size={14} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={store.reset}
+            title="Reset filters"
+            className="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent"
+          >
+            <RotateCcw size={14} />
+          </button>
+          {onClose && (
+            <button
+              onClick={onClose}
+              aria-label="Close filters"
+              className="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent md:hidden"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Seasons */}

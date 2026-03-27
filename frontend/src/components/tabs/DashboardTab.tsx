@@ -81,7 +81,7 @@ export function DashboardTab() {
         {/* Iron type split donut */}
         <div className="rounded-lg border border-border bg-card p-4">
           <h2 className="mb-3 text-sm font-semibold">Hit Location Split</h2>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
                 data={iron_split}
@@ -91,16 +91,15 @@ export function DashboardTab() {
                 cy="50%"
                 innerRadius={50}
                 outerRadius={80}
-                label={({ name, percent }) =>
-                  `${name} ${(percent * 100).toFixed(0)}%`
-                }
+                label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                 labelLine={false}
               >
                 {iron_split.map((_, i) => (
                   <Cell key={i} fill={IRON_COLORS[i % IRON_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(value, name) => [value, name]} />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -108,7 +107,7 @@ export function DashboardTab() {
         {/* Situation split donut */}
         <div className="rounded-lg border border-border bg-card p-4">
           <h2 className="mb-3 text-sm font-semibold">Situation Split</h2>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
                 data={situation_split}
@@ -118,16 +117,15 @@ export function DashboardTab() {
                 cy="50%"
                 innerRadius={50}
                 outerRadius={80}
-                label={({ name, percent }) =>
-                  `${name} ${(percent * 100).toFixed(0)}%`
-                }
+                label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                 labelLine={false}
               >
                 {situation_split.map((_, i) => (
                   <Cell key={i} fill={SITUATION_COLORS[i % SITUATION_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(value, name) => [value, name]} />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -141,15 +139,15 @@ export function DashboardTab() {
             <BarChart
               data={top_players}
               layout="vertical"
-              margin={{ left: 110, right: 20, top: 5, bottom: 5 }}
+              margin={{ left: 80, right: 10, top: 5, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
               <XAxis type="number" tick={{ fontSize: 11 }} />
               <YAxis
                 type="category"
                 dataKey="player_name"
-                width={105}
-                tick={{ fontSize: 11 }}
+                width={75}
+                tick={{ fontSize: 10 }}
               />
               <Tooltip />
               <Legend />
