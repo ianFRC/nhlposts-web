@@ -36,3 +36,10 @@ sync/__pycache__/
 
 # Playwright MCP artifacts
 .playwright-mcp/
+
+# Claude Code local config
+.claude/settings.local.json
+
+# Local scratch files
+network-requests.txt
+*.png
