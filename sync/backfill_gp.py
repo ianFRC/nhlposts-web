@@ -40,9 +40,11 @@ def main() -> None:
 
     with NHLClient(rate_limit=0.5) as client:
         resolver = PlayerResolver(store, client)
-        n = resolver.fetch_games_played_for_players(pairs, force=True)
+        for game_type in [2, 3]:
+            n = resolver.fetch_games_played_for_players(pairs, game_type=game_type, force=True)
+            logger.info("game_type=%d: re-fetched game logs for %d players", game_type, n)
 
-    logger.info("Done — re-fetched game logs for %d players", n)
+    logger.info("Done")
     store.close()
 
 

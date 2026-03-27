@@ -54,9 +54,17 @@ class SeasonFetcher:
         self._store = store
         self._ep = NHLEndpoints(client)
 
-    def fetch_season(self, season: str, game_type: int = 2) -> list[Game]:
-        """Fetch all games for a season by querying each team's schedule."""
-        logger.info("Discovering games for season %s via team schedules...", season)
+    def fetch_season(self, season: str, game_types: list[int] | None = None) -> list[Game]:
+        """Fetch all games for a season by querying each team's schedule.
+
+        game_types defaults to [2, 3] (regular season + playoffs).
+        """
+        if game_types is None:
+            game_types = [2, 3]
+        logger.info(
+            "Discovering games for season %s (game_types=%s) via team schedules...",
+            season, game_types,
+        )
         seen: dict[int, Game] = {}
 
         for team in ALL_TEAMS:
@@ -71,7 +79,7 @@ class SeasonFetcher:
 
             games_list = data.get("games", [])
             for gd in games_list:
-                if gd.get("gameType", 2) != game_type:
+                if gd.get("gameType", 2) not in game_types:
                     continue
                 game = _parse_game(gd, season)
                 if game and game.game_id not in seen:

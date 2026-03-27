@@ -85,16 +85,18 @@ def main() -> None:
                 "Fetching GP for %d players across %d newly ingested games...",
                 len(pairs), len(all_new_game_ids),
             )
-            n = resolver.fetch_games_played_for_players(pairs, force=True)
-            logger.info("GP fetched for %d players", n)
+            for game_type in [2, 3]:
+                n = resolver.fetch_games_played_for_players(pairs, game_type=game_type, force=True)
+                logger.info("GP (game_type=%d) fetched for %d players", game_type, n)
         else:
             logger.info("No new games ingested, skipping GP fetch")
 
         # ── Step 5: Refresh game logs for all players with post shots ─────── #
         all_pairs = store.get_distinct_player_seasons()
         logger.info("Refreshing GP for all %d player/season pairs...", len(all_pairs))
-        n = resolver.fetch_games_played_for_players(all_pairs)
-        logger.info("GP refreshed for %d players", n)
+        for game_type in [2, 3]:
+            n = resolver.fetch_games_played_for_players(all_pairs, game_type=game_type)
+            logger.info("GP (game_type=%d) refreshed for %d players", game_type, n)
 
         # ── Step 6: Resolve any unknown players ───────────────────────── #
         for season in SEASONS:
