@@ -6,9 +6,7 @@ import { SlidersHorizontal } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { DashboardTab } from "@/components/tabs/DashboardTab";
 import { PlayersTab } from "@/components/tabs/PlayersTab";
-import { TeamsTab } from "@/components/tabs/TeamsTab";
 import { ShotAnalysisTab } from "@/components/tabs/ShotAnalysisTab";
-import { TrendTab } from "@/components/tabs/TrendTab";
 import { ShotMapTab } from "@/components/tabs/ShotMapTab";
 import { PlayerSpotlightTab } from "@/components/tabs/PlayerSpotlightTab";
 import { DataTab } from "@/components/tabs/DataTab";
@@ -16,9 +14,7 @@ import { DataTab } from "@/components/tabs/DataTab";
 const TABS = [
   { id: "dashboard", label: "Dashboard" },
   { id: "players", label: "Players" },
-  { id: "teams", label: "Teams" },
   { id: "shot-analysis", label: "Shot Analysis" },
-  { id: "trend", label: "Trend" },
   { id: "shot-map", label: "Shot Map" },
   { id: "spotlight", label: "Player Spotlight" },
   { id: "data", label: "Data" },
@@ -32,12 +28,8 @@ function TabContent({ tab }: { tab: string }) {
       return <DashboardTab />;
     case "players":
       return <PlayersTab />;
-    case "teams":
-      return <TeamsTab />;
     case "shot-analysis":
       return <ShotAnalysisTab />;
-    case "trend":
-      return <TrendTab />;
     case "shot-map":
       return <ShotMapTab />;
     case "spotlight":
